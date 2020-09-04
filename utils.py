@@ -18,7 +18,7 @@ def seq_to_string(seq, idx_to_tok, input_tokens=None):
     vocab_size = len(idx_to_tok)
     seq_length = (seq != 0).sum()
     words = []
-    for idx in seq[:seq_length]:
+    for idx in seq[:seq_length].tolist():
         if idx < vocab_size:
             words.append(idx_to_tok[idx])
         elif input_tokens is not None:

@@ -6,14 +6,17 @@ from operator import itemgetter
 
 
 class Language(object):
-    def __init__(self, vocab_limit, data_path, parser, files=None):
+    def __init__(self, vocab_limit, data_path, parser, data=None):
         self.data_path = data_path
         self.parser = parser
 
-        if files:
-            self.files = files
+        if data:
+            self.data = data
         else:
-            self.files = os.listdir(self.data_path)
+            self.data = []
+            with open(self.data_path, 'r') as fr:
+                for line in fr:
+                    self.data.append(line.strip())
 
         self.vocab = self.create_vocab()
 
@@ -35,6 +38,15 @@ class Language(object):
 
         vocab = dict()
 
+        for line in self.data:
+            lines = line.split(' >>><<< ')
+            tokens = lines[0].split() + lines[1].split()
+            for token in tokens:
+                # do not add name tokens to vocab
+                if '@' not in token and 'http' not in token and 'www' not in token:
+                    vocab[token] = vocab.get(token, 0) + 1
+
+        '''
         for file_idx, file in enumerate(self.files):
             if file_idx % 1000 == 0:
                 print("reading file %i/%i" % (file_idx, len(self.files)), flush=True)
@@ -45,15 +57,16 @@ class Language(object):
                 tokens = list(lines)[0].split() + list(lines)[1].split()
                 for token in tokens:
                     # do not add name tokens to vocab
-                    if not contains_digit(token) and '@' not in token and 'http' not in token and 'www' not in token:
+                    if '@' not in token and 'http' not in token and 'www' not in token:
                         vocab[token] = vocab.get(token, 0) + 1
+        '''
         return vocab
 
 
 class SequencePairDataset(Dataset):
     def __init__(self,
-                 data_path='./data/',
-                 maxlen=200,
+                 data_path='./data/pmt.sample.line.data',
+                 maxlen=100,
                  lang=None,
                  vocab_limit=None,
                  val_size=0.1,
@@ -71,6 +84,26 @@ class SequencePairDataset(Dataset):
         self.is_val = is_val
         self.use_extended_vocab = use_extended_vocab
 
+        if self.data_path.endswith('.data'):
+            self.data = []
+            with open(self.data_path, 'r') as fr:
+                for line in fr:
+                    self.data.append(line.strip())
+            idxs = list(range(len(self.data)))
+            random.seed(self.seed)
+            random.shuffle(idxs)
+            num_val = int(len(idxs) * self.val_size)
+
+            if self.is_val:
+                idxs = idxs[:num_val]
+            else:
+                idxs = idxs[num_val:]
+
+            self.data = [self.data[idx] for idx in idxs]
+        else:
+            self.data = []
+
+        '''
         if os.path.isdir(self.data_path):
             self.files = [f for f in os.listdir(self.data_path) if not f.startswith('.')]
             idxs = list(range(len(self.files)))
@@ -86,14 +119,15 @@ class SequencePairDataset(Dataset):
             self.files = [self.files[idx] for idx in idxs]
         else:
             self.files = []
+        '''
 
         if lang is None:
-            lang = Language(vocab_limit, self.data_path, files=self.files, parser=self.parser)
+            lang = Language(vocab_limit, self.data_path, data=self.data, parser=self.parser)
 
         self.lang = lang
 
     def __len__(self):
-        return len(self.files)
+        return len(self.data)
 
     def __getitem__(self, idx):
         """
@@ -105,9 +139,12 @@ class SequencePairDataset(Dataset):
         output_token_list: list[int]
         token_mapping: binary array"""
 
-        with open(self.data_path + self.files[idx], "r", encoding='utf-8') as pair_file:
-            input_token_list = pair_file.readline().split()
-            output_token_list = pair_file.readline().split()
+        input_token_list = self.data[idx].split(' >>><<< ')[0].split()
+        output_token_list = self.data[idx].split(' >>><<< ')[1].split()
+
+        #with open(self.data_path + self.files[idx], "r", encoding='utf-8') as pair_file:
+        #    input_token_list = pair_file.readline().split()
+        #    output_token_list = pair_file.readline().split()
 
         input_token_list = (['<SOS>'] + input_token_list + ['<EOS>'])[:self.maxlen]
         output_token_list = (['<SOS>'] + output_token_list + ['<EOS>'])[:self.maxlen]

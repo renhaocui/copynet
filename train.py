@@ -189,14 +189,14 @@ def main(model_name, use_cuda, batch_size, teacher_forcing_schedule, keep_prob, 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Parse training parameters')
-    parser.add_argument('model_name', type=str,
+    parser.add_argument('--model_name', type=str, default='copynet',
                         help='the name of a subdirectory of ./model/ that '
                              'contains encoder and decoder model files')
 
-    parser.add_argument('--epochs', type=int, default=50,
+    parser.add_argument('--epochs', type=int, default=1,
                         help='the number of epochs to train')
 
-    parser.add_argument('--use_cuda', action='store_true',
+    parser.add_argument('--use_cuda', action='store_true', default=False,
                         help='flag indicating that cuda will be used')
 
     parser.add_argument('--batch_size', type=int, default=100,
@@ -221,7 +221,7 @@ if __name__ == '__main__':
     parser.add_argument('--decoder_type', type=str, default='copy',
                         help="Allowed values 'copy' or 'attn'")
 
-    parser.add_argument('--vocab_limit', type=int, default=5000,
+    parser.add_argument('--vocab_limit', type=int, default=10000,
                         help='When creating a new Language object the vocab'
                              'will be truncated to the most frequently'
                              'occurring words in the training dataset.')
@@ -233,7 +233,7 @@ if __name__ == '__main__':
     parser.add_argument('--embedding_size', type=int, default=128,
                         help='Embedding size used in both encoder and decoder')
 
-    parser.add_argument('--max_length', type=int, default=200,
+    parser.add_argument('--max_length', type=int, default=100,
                         help='Sequences will be padded or truncated to this size.')
 
     args = parser.parse_args()
@@ -244,5 +244,6 @@ if __name__ == '__main__':
     else:
         schedule = np.ones(args.epochs) * args.teacher_forcing_fraction
 
+    #main(args.model_name, args.use_cuda, args.batch_size, schedule, args.keep_prob, args.val_size, args.lr, args.decoder_type, args.vocab_limit, args.hidden_size, args.embedding_size, args.max_length)
     main(args.model_name, args.use_cuda, args.batch_size, schedule, args.keep_prob, args.val_size, args.lr, args.decoder_type, args.vocab_limit, args.hidden_size, args.embedding_size, args.max_length)
     # main(str(int(time.time())), args.use_cuda, args.batch_size, schedule, args.keep_prob, args.val_size, args.lr, args.decoder_type, args.vocab_limit, args.hidden_size, args.embedding_size, args.max_length)
