@@ -30,7 +30,7 @@ def train(encoder_decoder: EncoderDecoder,
     global_step = 0
     loss_function = torch.nn.NLLLoss(ignore_index=0)
     optimizer = optim.Adam(encoder_decoder.parameters(), lr=lr)
-    model_path = './model/' + model_name + '/'
+    model_path = '/content/drive/My Drive/Cui_workspace/CopyNet/model/' + model_name + '/'
 
     for epoch, teacher_forcing in enumerate(teacher_forcing_schedule):
         print('epoch %i' % epoch, flush=True)
@@ -116,7 +116,7 @@ def train(encoder_decoder: EncoderDecoder,
 
 def main(model_name, use_cuda, batch_size, teacher_forcing_schedule, keep_prob, val_size, lr, decoder_type, vocab_limit, hidden_size, embedding_size, max_length, seed=42):
 
-    model_path = './model/' + model_name + '/'
+    model_path = '/content/drive/My Drive/Cui_workspace/CopyNet/model/' + model_name + '/'
 
     # TODO: Change logging to reflect loaded parameters
 
@@ -193,10 +193,10 @@ if __name__ == '__main__':
                         help='the name of a subdirectory of ./model/ that '
                              'contains encoder and decoder model files')
 
-    parser.add_argument('--epochs', type=int, default=1,
+    parser.add_argument('--epochs', type=int, default=7,
                         help='the number of epochs to train')
 
-    parser.add_argument('--use_cuda', action='store_true', default=False,
+    parser.add_argument('--use_cuda', action='store_true', default=True,
                         help='flag indicating that cuda will be used')
 
     parser.add_argument('--batch_size', type=int, default=100,
