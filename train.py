@@ -193,13 +193,13 @@ if __name__ == '__main__':
                         help='the name of a subdirectory of ./model/ that '
                              'contains encoder and decoder model files')
 
-    parser.add_argument('--epochs', type=int, default=7,
+    parser.add_argument('--epochs', type=int, default=5,
                         help='the number of epochs to train')
 
     parser.add_argument('--use_cuda', action='store_true', default=True,
                         help='flag indicating that cuda will be used')
 
-    parser.add_argument('--batch_size', type=int, default=100,
+    parser.add_argument('--batch_size', type=int, default=64,
                         help='number of examples in a batch')
 
     parser.add_argument('--teacher_forcing_fraction', type=float, default=0.5,
@@ -221,7 +221,7 @@ if __name__ == '__main__':
     parser.add_argument('--decoder_type', type=str, default='copy',
                         help="Allowed values 'copy' or 'attn'")
 
-    parser.add_argument('--vocab_limit', type=int, default=10000,
+    parser.add_argument('--vocab_limit', type=int, default=20000,
                         help='When creating a new Language object the vocab'
                              'will be truncated to the most frequently'
                              'occurring words in the training dataset.')
@@ -230,7 +230,7 @@ if __name__ == '__main__':
                         help='The number of RNN units in the encoder. 2x this '
                              'number of RNN units will be used in the decoder')
 
-    parser.add_argument('--embedding_size', type=int, default=128,
+    parser.add_argument('--embedding_size', type=int, default=256,
                         help='Embedding size used in both encoder and decoder')
 
     parser.add_argument('--max_length', type=int, default=100,

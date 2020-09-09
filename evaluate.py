@@ -11,7 +11,7 @@ from torch.utils.data import DataLoader
 from tqdm import tqdm
 from nltk.translate.bleu_score import corpus_bleu, SmoothingFunction
 
-
+@torch.no_grad()
 def evaluate(encoder_decoder: EncoderDecoder, data_loader):
 
     loss_function = torch.nn.NLLLoss(ignore_index=0, reduce=False) # what does this return for ignored idxs? same length output?
@@ -25,8 +25,8 @@ def evaluate(encoder_decoder: EncoderDecoder, data_loader):
 
         sorted_lengths, order = torch.sort(input_lengths, descending=True)
 
-        input_variable = Variable(input_idxs[order, :][:, :max(input_lengths)], volatile=True)
-        target_variable = Variable(target_idxs[order, :], volatile=True)
+        input_variable = Variable(input_idxs[order, :][:, :max(input_lengths)])
+        target_variable = Variable(target_idxs[order, :])
         batch_size = input_variable.shape[0]
 
         output_log_probs, output_seqs = encoder_decoder(input_variable, list(sorted_lengths))
