@@ -3,7 +3,7 @@ import random
 from torch.autograd import Variable
 from dataset import SequencePairDataset
 from utils import seq_to_string, to_np, trim_seqs
-from encoder_decoder import EncoderDecoder
+from model.encoder_decoder import EncoderDecoder
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 
@@ -91,8 +91,8 @@ def main(model_path, outputFilename, data_path, use_cuda, batch_size):
 
 if __name__ == '__main__':
     model_path = 'model/copynet_full_20000_3.pt'
-    data_path = 'data/commTweets.NNP.tokenized.sampled.original'
-    result_path = 'data/commTweets.NNP.tokenized.sampled.original.copynet'
+    data_path = 'data/commTweets.test_10k.list'
+    result_path = 'data/commTweets.test_10k.copynet'
     use_cuda = False
     batch_size = 100
     try:
