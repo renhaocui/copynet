@@ -39,8 +39,11 @@ class Language(object):
         vocab = dict()
 
         for line in self.data:
-            lines = line.split(' >>><<< ')
-            tokens = lines[0].split() + lines[1].split()
+            if ' >>><<< ' in line:
+                lines = line.split(' >>><<< ')
+                tokens = lines[0].split() + lines[1].split()
+            else:
+                tokens = line.split()
             for token in tokens:
                 # do not add name tokens to vocab
                 if '@' not in token and 'http' not in token and 'www' not in token:
@@ -73,7 +76,8 @@ class SequencePairDataset(Dataset):
                  seed=42,
                  is_val=False,
                  use_cuda=False,
-                 use_extended_vocab=True):
+                 use_extended_vocab=True,
+                 shuffle=True):
 
         self.data_path = data_path
         self.maxlen = maxlen
@@ -83,25 +87,24 @@ class SequencePairDataset(Dataset):
         self.seed = seed
         self.is_val = is_val
         self.use_extended_vocab = use_extended_vocab
+        self.shuffle = shuffle
 
-        if self.data_path.endswith('.data'):
-            self.data = []
-            with open(self.data_path, 'r') as fr:
-                for line in fr:
-                    self.data.append(line.strip())
-            idxs = list(range(len(self.data)))
-            random.seed(self.seed)
+        self.data = []
+        with open(self.data_path, 'r') as fr:
+            for line in fr:
+                self.data.append(line.strip())
+        idxs = list(range(len(self.data)))
+        random.seed(self.seed)
+        if self.shuffle:
             random.shuffle(idxs)
-            num_val = int(len(idxs) * self.val_size)
+        num_val = int(len(idxs) * self.val_size)
 
-            if self.is_val:
-                idxs = idxs[:num_val]
-            else:
-                idxs = idxs[num_val:]
-
-            self.data = [self.data[idx] for idx in idxs]
+        if self.is_val:
+            idxs = idxs[:num_val]
         else:
-            self.data = []
+            idxs = idxs[num_val:]
+
+        self.data = [self.data[idx] for idx in idxs]
 
         '''
         if os.path.isdir(self.data_path):
@@ -139,8 +142,12 @@ class SequencePairDataset(Dataset):
         output_token_list: list[int]
         token_mapping: binary array"""
 
-        input_token_list = self.data[idx].split(' >>><<< ')[0].split()
-        output_token_list = self.data[idx].split(' >>><<< ')[1].split()
+        if ' >>><<< ' in self.data[idx]:
+            input_token_list = self.data[idx].split(' >>><<< ')[0].split()
+            output_token_list = self.data[idx].split(' >>><<< ')[1].split()
+        else:
+            input_token_list = self.data[idx].split()
+            output_token_list = self.data[idx].split()
 
         #with open(self.data_path + self.files[idx], "r", encoding='utf-8') as pair_file:
         #    input_token_list = pair_file.readline().split()

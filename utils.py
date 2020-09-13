@@ -16,15 +16,20 @@ def to_np(x):
 
 def seq_to_string(seq, idx_to_tok, input_tokens=None):
     vocab_size = len(idx_to_tok)
-    seq_length = (seq != 0).sum()
+    seq_length = sum([value != 0 for value in seq])
+    #seq_length = (seq != 0).sum()
     words = []
-    for idx in seq[:seq_length].tolist():
+    for idx in seq[:seq_length]:
+        idx = idx.tolist()
         if idx < vocab_size:
             words.append(idx_to_tok[idx])
         elif input_tokens is not None:
             words.append(input_tokens[idx - vocab_size])
         else:
             words.append('<???>')
+    words.remove('<SOS>')
+    if '<EOS>' in words:
+        words.remove('<EOS>')
     string = ' '.join(words)
     return string
 
