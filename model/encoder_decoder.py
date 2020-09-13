@@ -1,9 +1,9 @@
 from torch import nn
-from attention_decoder import AttentionDecoder
-from copynet_decoder import CopyNetDecoder
+from .attention_decoder import AttentionDecoder
+from .copynet_decoder import CopyNetDecoder
 from utils import seq_to_string, tokens_to_seq
 from spacy.lang.en import English
-from encoder import EncoderRNN
+from .encoder import EncoderRNN
 from torch.autograd import Variable
 
 
