@@ -68,7 +68,7 @@ class Language(object):
 
 class SequencePairDataset(Dataset):
     def __init__(self,
-                 data_path='/content/drive/My Drive/Cui_workspace/CopyNet/data/pmt.sample.line.data',
+                 data_path='line.data',
                  maxlen=100,
                  lang=None,
                  vocab_limit=None,
