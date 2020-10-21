@@ -1,6 +1,21 @@
 from nltk.translate.bleu_score import sentence_bleu
 from rouge_score import rouge_scorer
 import json
+from sentence_transformers import SentenceTransformer
+from sklearn.metrics.pairwise import cosine_similarity
+
+
+def computeSimilarity(originalTextList, paraphraseTextList):
+    model = SentenceTransformer('bert-base-nli-mean-tokens')
+    #model = SentenceTransformer('roberta-large-nli-stsb-mean-tokens')
+
+    outputScores = []
+    originalSentEmbeddings = model.encode(originalTextList)
+    paraphraseSentEmbeddings = model.encode(paraphraseTextList)
+    for originalSent, paraphraseSent in zip(originalSentEmbeddings, paraphraseSentEmbeddings):
+        outputScores.append(cosine_similarity([originalSent], [paraphraseSent]).tolist()[0][0])
+
+    return outputScores
 
 
 def computeBLEU(originalTextList, paraphraseTextList):
